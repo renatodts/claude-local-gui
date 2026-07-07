@@ -1,0 +1,9 @@
+{
+  "name": "local-gui",
+  "description": "Ephemeral local web GUI for Claude Code tasks — live dashboard, approvals, forms, chat, editable tables over SSE",
+  "version": "1.0.0",
+  "author": {
+    "name": "Renato de Matos",
+    "email": "contact@renatodematos.com"
+  }
+}
