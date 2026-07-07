@@ -38,9 +38,12 @@ Node.js `http` server, a state file, and a JSON-lines inbox.
 
 ### Option 1 — as a plugin
 
+Add the [renatodts/claude-plugins](https://github.com/renatodts/claude-plugins)
+marketplace once, then install:
+
 ```
-/plugin marketplace add renatodts/claude-local-gui
-/plugin install local-gui@claude-local-gui
+/plugin marketplace add renatodts/claude-plugins
+/plugin install local-gui@renatodts
 ```
 
 ### Option 2 — manual
