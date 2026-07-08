@@ -90,12 +90,17 @@ function shell() {
 <div id="banner" hidden>connection lost — reconnecting…</div>
 <main id="app">${custom ?? ''}</main>
 ${custom !== null ? '<script>window.__customPage = true</script>' : ''}
+<script src="/assets/markdown-it.min.js"></script>
 <script src="/assets/base.js"></script>
 </body>
 </html>`;
 }
 
-const ASSET_TYPES = { 'base.css': 'text/css; charset=utf-8', 'base.js': 'text/javascript; charset=utf-8' };
+const ASSET_TYPES = {
+  'base.css': 'text/css; charset=utf-8',
+  'base.js': 'text/javascript; charset=utf-8',
+  'markdown-it.min.js': 'text/javascript; charset=utf-8',
+};
 
 function serveAsset(res, name) {
   if (!Object.hasOwn(ASSET_TYPES, name)) { res.writeHead(404); res.end(); return; }

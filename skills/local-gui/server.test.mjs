@@ -228,3 +228,17 @@ test('without page.html does not set __customPage', async () => {
   const html = await (await fetch(base + '/')).text();
   assert.doesNotMatch(html, /__customPage/);
 });
+
+test('serves vendored markdown-it and loads it in the shell before base.js', async () => {
+  const { base } = await startServer();
+  const res = await fetch(base + '/assets/markdown-it.min.js');
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /text\/javascript/);
+  const body = await res.text();
+  assert.ok(body.length > 10000, 'vendored bundle should be present, not a stub');
+  const html = await (await fetch(base + '/')).text();
+  const mdIdx = html.indexOf('/assets/markdown-it.min.js');
+  const baseIdx = html.indexOf('/assets/base.js');
+  assert.ok(mdIdx > -1, 'shell must reference markdown-it');
+  assert.ok(mdIdx < baseIdx, 'markdown-it must load before base.js');
+});
