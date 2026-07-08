@@ -70,6 +70,17 @@ re-render wipes in-progress typing (chat input is preserved automatically).
 
 ## Waiting for user input
 
+state.json → page is push (SSE), but page → agent is only a file
+(`inbox.jsonl`) — the agent side of that direction is necessarily a poll.
+Run that poll as a **backgrounded** Bash call, never in the foreground:
+a foreground wait blocks the whole turn (up to 8 minutes) and the user
+can't chat, ask something else, or interact with you while it's running —
+only with the page. Launch the loop below with the background option
+right after publishing any interactive block (`choices`/`form`/`chat`/
+`table`), then go on to whatever's next (respond to the user, prep the
+next state.json, work on something else); you get notified automatically
+when the loop exits, so don't sleep-poll it yourself from the outside.
+
 ```bash
 # OFFSET = inbox lines already processed (start at 0; after each read, set it to the total lines read)
 D=...; PID=...; OFFSET=0
@@ -85,7 +96,11 @@ echo "TIMEOUT"
 
 Line format: `{"ts", "block", "kind": "choice|form|chat|table", "value"}`.
 On `TIMEOUT` (~8 min), tell the user in the terminal and ask whether to keep
-waiting. On `SERVER_DEAD`, report it and offer to restart.
+waiting — if so, relaunch the same loop in the background again (fresh
+`OFFSET`/`end`). On `SERVER_DEAD`, report it and offer to restart. If you
+were mid-response when the notification arrives, finish that thought before
+switching to the new input — don't drop your own train of thought to react
+instantly.
 
 ## Shutdown (required at the end of the task)
 
