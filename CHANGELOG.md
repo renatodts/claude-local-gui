@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Horizontal steps: `{ "type": "steps", "direction": "horizontal" }` renders a stepper with connector lines; long labels truncate with an ellipsis and show in full on hover.
+- Submit feedback: clicking any choice/form/table button now disables the block, spins the clicked button and shows a "Sent — waiting for a response…" hint until the next state republish; network failures re-enable the controls with an error message.
+- Chat: messages appear instantly as an optimistic bubble (dimmed while sending, outlined on failure) instead of waiting for the agent's echo.
+- Visual refresh in the spirit of shadcn/ui: neutral zinc palette in light and dark, solid dark primary buttons, focus rings on buttons and inputs, subtle card shadows, refined typography, table row hover, underlined links.
+- Fixed the favicon 404 console error.
+
 ## 1.0.0 — initial release
 
 - Zero-dependency Node.js local web server driven entirely by files (`state.json` in, `inbox.jsonl` out).

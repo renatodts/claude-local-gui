@@ -83,6 +83,7 @@ function shell() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(state.title ?? 'local-gui')}</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="/assets/base.css">
 </head>
 <body>

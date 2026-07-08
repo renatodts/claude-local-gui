@@ -45,6 +45,26 @@
       .split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
   }
 
+  // Disables controls, spins the clicked button and shows a "waiting" hint
+  // until the next state republish re-renders the block. On network failure,
+  // re-enables everything so the user can retry.
+  function sendPending(card, btn, controls, block, kind, value) {
+    for (const c of controls) c.disabled = true;
+    btn.classList.add('loading');
+    const hint = el('div', { class: 'pending-hint' },
+      el('span', { class: 'spinner sm' }),
+      el('span', {}, 'Sent — waiting for a response…'));
+    card.append(hint);
+    guiSubmit(block, kind, value)
+      .then(r => { if (!r.ok) throw new Error('submit failed'); })
+      .catch(() => {
+        btn.classList.remove('loading');
+        for (const c of controls) c.disabled = false;
+        hint.classList.add('error');
+        hint.replaceChildren('Failed to send — check the connection and try again.');
+      });
+  }
+
   const renderers = {
     status(b) {
       return el('div', { class: 'card status' },
@@ -52,9 +72,11 @@
         el('span', {}, b.text ?? ''));
     },
     steps(b) {
-      return el('div', { class: 'card' }, el('ol', { class: 'steps' },
-        (b.items ?? []).map(it => el('li', { class: `step ${it.state ?? 'pending'}` },
-          el('span', { class: 'step-icon' }), it.label ?? ''))));
+      const horizontal = b.direction === 'horizontal';
+      return el('div', { class: 'card' }, el('ol', { class: `steps${horizontal ? ' horizontal' : ''}` },
+        (b.items ?? []).map(it => el('li', { class: `step ${it.state ?? 'pending'}`, title: it.label ?? '' },
+          el('span', { class: 'step-icon' }),
+          el('span', { class: 'step-label' }, it.label ?? '')))));
     },
     markdown(b) {
       const d = el('div', { class: 'card markdown' });
@@ -67,18 +89,16 @@
       return d;
     },
     choices(b) {
+      const card = el('div', { class: 'card' });
       const choicesDiv = el('div', { class: 'choices' }, (b.options ?? []).map(o =>
         el('button', {
           class: `btn ${o.style ?? 'primary'}`,
           disabled: !!b.answered,
-          onclick: (e) => {
-            for (const btn of choicesDiv.querySelectorAll('button')) btn.disabled = true;
-            guiSubmit(b.id, 'choice', o.value);
-          },
+          onclick: (e) => sendPending(card, e.currentTarget,
+            choicesDiv.querySelectorAll('button'), b.id, 'choice', o.value),
         }, o.label ?? o.value)));
-      return el('div', { class: 'card' },
-        el('p', { class: 'prompt' }, b.prompt ?? ''),
-        choicesDiv);
+      card.append(el('p', { class: 'prompt' }, b.prompt ?? ''), choicesDiv);
+      return card;
     },
     form(b) {
       const form = el('form', { class: 'card form' });
@@ -96,8 +116,9 @@
         input.disabled = !!b.answered;
         form.append(el('label', { for: id }, f.label ?? f.name), input);
       }
-      form.append(el('button', { class: 'btn primary', type: 'submit', disabled: !!b.answered },
-        b.submit ?? 'Submit'));
+      const submitBtn = el('button', { class: 'btn primary', type: 'submit', disabled: !!b.answered },
+        b.submit ?? 'Submit');
+      form.append(submitBtn);
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const value = {};
@@ -105,7 +126,8 @@
           const raw = form.elements[f.name].value;
           value[f.name] = f.kind === 'number' ? Number(raw) : raw;
         }
-        guiSubmit(b.id, 'form', value);
+        sendPending(form, submitBtn,
+          form.querySelectorAll('input, textarea, select, button'), b.id, 'form', value);
       });
       return form;
     },
@@ -116,8 +138,18 @@
       const send = () => {
         const text = input.value.trim();
         if (!text) return;
-        guiSubmit(b.id, 'chat', text);
+        // Optimistic bubble: replaced by the echoed message on the next re-render.
+        const bubble = el('div', { class: 'msg user sending' }, text);
+        log.append(bubble);
+        log.scrollTop = log.scrollHeight;
         input.value = '';
+        guiSubmit(b.id, 'chat', text)
+          .then(r => { if (!r.ok) throw new Error('submit failed'); bubble.classList.remove('sending'); })
+          .catch(() => {
+            bubble.classList.remove('sending');
+            bubble.classList.add('failed');
+            bubble.title = 'Failed to send';
+          });
       };
       input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
       const wrap = el('div', { class: 'card chat' }, log,
@@ -153,7 +185,8 @@
         card.append(el('button', {
           class: 'btn primary',
           disabled: !!b.answered,
-          onclick: () => guiSubmit(b.id, 'table', { rows }),
+          onclick: (e) => sendPending(card, e.currentTarget,
+            card.querySelectorAll('input, button'), b.id, 'table', { rows }),
         }, b.submit ?? 'Submit'));
       }
       return card;

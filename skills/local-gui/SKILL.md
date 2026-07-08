@@ -37,7 +37,8 @@ re-render wipes in-progress typing (chat input is preserved automatically).
 ```json
 { "title": "Title", "blocks": [
   { "type": "status",   "text": "Processing...", "spinner": true },
-  { "type": "steps",    "items": [ { "label": "Step", "state": "done|active|pending|error" } ] },
+  { "type": "steps",    "direction": "vertical|horizontal",
+    "items": [ { "label": "Step", "state": "done|active|pending|error" } ] },
   { "type": "markdown", "content": "**basic** markdown: bold, italic, `code`, [link](url)" },
   { "type": "choices",  "id": "x", "prompt": "Question?", "answered": false,
     "options": [ { "value": "v", "label": "Label", "style": "primary|danger|ghost" } ] },
@@ -50,8 +51,12 @@ re-render wipes in-progress typing (chat input is preserved automatically).
   { "type": "html",     "content": "<div>free-form inline HTML</div>" } ] }
 ```
 
+- Steps: `direction` is optional (default vertical). Horizontal steps truncate
+  long labels with an ellipsis; the full label shows on hover.
 - Interactive blocks require a unique `id`. After processing a response,
   republish the state with `"answered": true` on that block (disables the controls).
+  After any click/submit the page shows a built-in "waiting for a response…"
+  hint until the next republish — process inbox lines and republish promptly.
 - In chat, echo the user's message and your reply in `messages` when you republish.
   Chat does NOT respect `answered` (the message field always stays active).
 - Fully custom page: write `$D/page.html` — it replaces the renderer.
