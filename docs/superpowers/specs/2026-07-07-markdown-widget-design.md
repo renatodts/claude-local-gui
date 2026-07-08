@@ -74,8 +74,8 @@ ephemeral design.
 
 ### 5. Versioning
 
-- `CHANGELOG.md`: new `1.2.0` entry.
-- `.claude-plugin/plugin.json`: version → `1.2.0`.
+- `CHANGELOG.md`: new `1.3.0` entry.
+- `.claude-plugin/plugin.json`: version → `1.3.0`.
 
 ### 6. Testing
 

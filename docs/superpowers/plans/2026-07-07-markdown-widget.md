@@ -17,7 +17,7 @@
 - Library and version: markdown-it **14.1.0**, minified UMD dist bundle (exposes `window.markdownit` in the browser).
 - Security model unchanged: raw HTML in markdown must render as escaped text (`html: false`); `javascript:` links must not become anchors (markdown-it default `validateLink`).
 - Tests run with: `node --test skills/local-gui/` from the repo root. All existing tests must keep passing.
-- Plugin version after this feature: **1.2.0**.
+- Plugin version after this feature: **1.3.0** (1.2.0 was released concurrently for the staleness badge).
 
 ---
 
@@ -307,7 +307,7 @@ git commit -m "feat: styles for rich markdown elements (headings, lists, code fe
 
 ---
 
-### Task 4: Documentation and version bump to 1.2.0
+### Task 4: Documentation and version bump to 1.3.0
 
 **Files:**
 - Modify: `skills/local-gui/SKILL.md` (markdown line in the state.json protocol, ~line 42, and the bullet list below it)
@@ -346,7 +346,7 @@ And in the bullet list under the protocol (after the "Steps:" bullet), add:
 Insert at the top of `CHANGELOG.md`, right after the `# Changelog` heading:
 
 ```markdown
-## 1.2.0
+## 1.3.0
 
 - Markdown blocks now render full CommonMark + GFM tables/strikethrough via a vendored markdown-it 14.1.0 (previously a minimal regex renderer: bold/italic/code/links only). Raw HTML in markdown is escaped; use the `html` block for raw HTML. Bare URLs auto-link and single newlines become line breaks.
 - Chat messages (assistant and user) also render markdown.
@@ -355,13 +355,13 @@ Insert at the top of `CHANGELOG.md`, right after the `# Changelog` heading:
 
 - [ ] **Step 3: Bump plugin.json**
 
-In `.claude-plugin/plugin.json`, change `"version": "1.1.0"` to `"version": "1.2.0"`.
+In `.claude-plugin/plugin.json`, change `"version": "1.2.0"` to `"version": "1.3.0"`.
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add skills/local-gui/SKILL.md CHANGELOG.md .claude-plugin/plugin.json
-git commit -m "docs: document full markdown rendering, bump to v1.2.0"
+git commit -m "docs: document full markdown rendering, bump to v1.3.0"
 ```
 
 ---
