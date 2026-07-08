@@ -45,7 +45,7 @@ stalled.
   { "type": "status",   "text": "Processing...", "spinner": true },
   { "type": "steps",    "direction": "vertical|horizontal",
     "items": [ { "label": "Step", "state": "done|active|pending|error" } ] },
-  { "type": "markdown", "content": "**basic** markdown: bold, italic, `code`, [link](url)" },
+  { "type": "markdown", "content": "# Full markdown\nCommonMark + GFM tables/strikethrough. Raw HTML is escaped — use the html block for that." },
   { "type": "choices",  "id": "x", "prompt": "Question?", "answered": false,
     "options": [ { "value": "v", "label": "Label", "style": "primary|danger|ghost" } ] },
   { "type": "form",     "id": "y", "submit": "Save", "answered": false,
@@ -59,6 +59,10 @@ stalled.
 
 - Steps: `direction` is optional (default vertical). Horizontal steps truncate
   long labels with an ellipsis; the full label shows on hover.
+- Markdown: full CommonMark plus GFM tables and strikethrough (markdown-it).
+  Raw HTML inside markdown renders as escaped text — use the `html` block for
+  raw HTML. Bare URLs auto-link; single newlines become line breaks. Chat
+  messages also render markdown.
 - Interactive blocks require a unique `id`. After processing a response,
   republish the state with `"answered": true` on that block (disables the controls).
   After any click/submit the page shows a built-in "waiting for a response…"

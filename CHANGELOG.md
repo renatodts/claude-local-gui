@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+- Markdown blocks now render full CommonMark + GFM tables/strikethrough via a vendored markdown-it 14.1.0 (previously a minimal regex renderer: bold/italic/code/links only). Raw HTML in markdown is escaped; use the `html` block for raw HTML. Bare URLs auto-link and single newlines become line breaks.
+- Chat messages (assistant and user) also render markdown.
+- New styles for rich markdown: headings, lists, blockquotes, fenced code blocks, horizontal rules and images, in light and dark themes.
+
 ## 1.2.0
 
 - Staleness badge: a bottom-right "updated Ns ago" pill appears after 15s
