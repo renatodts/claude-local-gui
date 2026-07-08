@@ -16,7 +16,7 @@
 - No network access at runtime; the download happens once, during implementation.
 - Library and version: markdown-it **14.1.0**, minified UMD dist bundle (exposes `window.markdownit` in the browser).
 - Security model unchanged: raw HTML in markdown must render as escaped text (`html: false`); `javascript:` links must not become anchors (markdown-it default `validateLink`).
-- Tests run with: `node --test skills/local-gui/` from the repo root. All existing tests must keep passing.
+- Tests run with: `node --test skills/local-gui/server.test.mjs` from the repo root. All existing tests must keep passing.
 - Plugin version after this feature: **1.3.0** (1.2.0 was released concurrently for the staleness badge).
 
 ---
@@ -54,7 +54,7 @@ test('serves vendored markdown-it and loads it in the shell before base.js', asy
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `node --test skills/local-gui/`
+Run: `node --test skills/local-gui/server.test.mjs`
 Expected: the new test FAILS (`/assets/markdown-it.min.js` returns 404 → `assert.equal(res.status, 200)` fails). All pre-existing tests PASS.
 
 - [ ] **Step 3: Download the library**
@@ -110,7 +110,7 @@ ${custom !== null ? '<script>window.__customPage = true</script>' : ''}
 
 - [ ] **Step 5: Run the tests to verify they pass**
 
-Run: `node --test skills/local-gui/`
+Run: `node --test skills/local-gui/server.test.mjs`
 Expected: ALL tests PASS (including the new one).
 
 - [ ] **Step 6: Commit**
@@ -211,7 +211,7 @@ to:
 
 - [ ] **Step 3: Run the server tests (regression check)**
 
-Run: `node --test skills/local-gui/`
+Run: `node --test skills/local-gui/server.test.mjs`
 Expected: ALL tests PASS (this task changes browser-side code only; rendering is verified end-to-end in Task 5).
 
 - [ ] **Step 4: Commit**
@@ -295,7 +295,7 @@ pre code { background: none; border: none; padding: 0; font-size: .8125rem; }
 
 - [ ] **Step 3: Run the server tests (regression check)**
 
-Run: `node --test skills/local-gui/`
+Run: `node --test skills/local-gui/server.test.mjs`
 Expected: ALL tests PASS. Visual verification happens in Task 5.
 
 - [ ] **Step 4: Commit**

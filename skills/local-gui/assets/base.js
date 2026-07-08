@@ -54,9 +54,9 @@
   }
 
   // Full markdown via vendored markdown-it. html:false escapes raw HTML
-  // (same trust model as the old regex renderer); validateLink blocks
-  // javascript: etc. by default. Falls back to escaped text if the
-  // bundle failed to load.
+  // as the old regex renderer did (though the rendered markdown surface
+  // is much larger now); validateLink blocks javascript: etc. by default.
+  // Falls back to escaped text if the bundle failed to load.
   const mdit = window.markdownit
     ? window.markdownit({ html: false, linkify: true, breaks: true })
     : null;
