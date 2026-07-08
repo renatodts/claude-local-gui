@@ -32,6 +32,12 @@ Rewrite `$D/state.json` with Write/Edit — the page updates itself (SSE,
 Avoid republishing state while a form/table is awaiting user input — a
 re-render wipes in-progress typing (chat input is preserved automatically).
 
+The page shows a small "updated Ns ago" badge (bottom-right) once 15s pass
+with no state broadcast. Whenever you start or switch long-running work,
+republish state (e.g. update a `status` block's text) so the user can tell
+you're alive and working — a spinner with no fresh writes behind it looks
+stalled.
+
 ### `state.json` protocol
 
 ```json

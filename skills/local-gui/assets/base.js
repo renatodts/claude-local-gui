@@ -9,17 +9,38 @@
       body: JSON.stringify({ block, kind, value }),
     });
 
+  let lastUpdate = Date.now();
+
   const es = new EventSource('/events');
   es.onopen = () => { banner.hidden = true; };
   es.onerror = () => { banner.hidden = false; };
   es.onmessage = (e) => {
     let state;
     try { state = JSON.parse(e.data); } catch { return; }
+    lastUpdate = Date.now();
     document.title = state.title || 'local-gui';
     window.dispatchEvent(new CustomEvent('gui:state', { detail: state }));
     if (window.__customPage) return;
     render(state);
   };
+
+  // Staleness badge: shows how long since the last state broadcast once it
+  // exceeds STALE_AFTER_MS. Hidden while the connection banner is showing
+  // (a dropped connection is the stronger signal). Appended to <body> so it
+  // also works on custom page.html pages, which replace #app but keep base.js.
+  const STALE_AFTER_MS = 15_000;
+  const stale = document.createElement('div');
+  stale.id = 'stale-badge';
+  stale.hidden = true;
+  document.body.append(stale);
+  setInterval(() => {
+    const age = Date.now() - lastUpdate;
+    const show = age >= STALE_AFTER_MS && banner.hidden;
+    stale.hidden = !show;
+    if (!show) return;
+    const secs = Math.round(age / 1000);
+    stale.textContent = secs < 60 ? `updated ${secs}s ago` : `updated ${Math.floor(secs / 60)}m ago`;
+  }, 1000);
 
   function el(tag, attrs = {}, ...children) {
     const n = document.createElement(tag);

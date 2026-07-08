@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Staleness badge: a bottom-right "updated Ns ago" pill appears after 15s
+  without a state update and resets on every broadcast; hidden while the
+  connection-lost banner is showing.
+
 ## 1.1.0
 
 - Horizontal steps: `{ "type": "steps", "direction": "horizontal" }` renders a stepper with connector lines; long labels truncate with an ellipsis and show in full on hover.
