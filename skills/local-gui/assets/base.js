@@ -32,17 +32,27 @@
     return n;
   }
 
-  const SAFE_HREF = /^(https?:|mailto:|#|\/)/i;
+  // Full markdown via vendored markdown-it. html:false escapes raw HTML
+  // (same trust model as the old regex renderer); validateLink blocks
+  // javascript: etc. by default. Falls back to escaped text if the
+  // bundle failed to load.
+  const mdit = window.markdownit
+    ? window.markdownit({ html: false, linkify: true, breaks: true })
+    : null;
+  if (mdit) {
+    const defaultLink = mdit.renderer.rules.link_open
+      ?? ((tokens, idx, options, env, self) => self.renderToken(tokens, idx, options));
+    mdit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+      tokens[idx].attrSet('target', '_blank');
+      tokens[idx].attrSet('rel', 'noreferrer');
+      return defaultLink(tokens, idx, options, env, self);
+    };
+  }
 
   function md(src) {
-    const esc = String(src).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    return esc
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, url) =>
-        SAFE_HREF.test(url) ? `<a href="${url}" target="_blank" rel="noreferrer">${label}</a>` : label)
-      .split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    if (mdit) return mdit.render(String(src ?? ''));
+    const esc = String(src ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    return `<p>${esc.replace(/\n/g, '<br>')}</p>`;
   }
 
   // Disables controls, spins the clicked button and shows a "waiting" hint
@@ -132,14 +142,18 @@
       return form;
     },
     chat(b) {
-      const log = el('div', { class: 'chat-log' }, (b.messages ?? []).map(m =>
-        el('div', { class: `msg ${m.role}` }, m.text ?? '')));
+      const log = el('div', { class: 'chat-log' }, (b.messages ?? []).map(m => {
+        const d = el('div', { class: `msg ${m.role}` });
+        d.innerHTML = md(m.text ?? '');
+        return d;
+      }));
       const input = el('input', { type: 'text', placeholder: 'Message…', 'data-gui-chat': b.id });
       const send = () => {
         const text = input.value.trim();
         if (!text) return;
         // Optimistic bubble: replaced by the echoed message on the next re-render.
-        const bubble = el('div', { class: 'msg user sending' }, text);
+        const bubble = el('div', { class: 'msg user sending' });
+        bubble.innerHTML = md(text);
         log.append(bubble);
         log.scrollTop = log.scrollHeight;
         input.value = '';
